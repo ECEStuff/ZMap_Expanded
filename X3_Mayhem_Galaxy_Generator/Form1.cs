@@ -401,10 +401,12 @@ namespace X3_Mayhem_Galaxy_Generator
             if (!X3Galaxy.HasUnknownEnclave())
             {
                 lblWarning.Text = "Warning!   This map has no unknown enclaves and while usable, does not support the new Renegades Plot line.";
+                lblWarning.ForeColor = System.Drawing.Color.Red;
             }
             else
             {
                 lblWarning.Text = "Map is Valid.   (Remember, double click a sector to edit stats, gates and more!)";
+                lblWarning.ForeColor = System.Drawing.Color.Green;
             }
         }
 
