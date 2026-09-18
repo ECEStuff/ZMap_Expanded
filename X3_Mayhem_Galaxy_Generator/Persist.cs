@@ -270,7 +270,10 @@ namespace X3_Mayhem_Galaxy_Generator
             // 1.77 - just double check that the map has at least one unknown enclave system.
             if (!X3Galaxy.HasUnknownEnclave())
             {
-                MessageBox.Show("Warning: This map does not qualify for the Renegades Plotline.  Please generate another.");
+                MessageBox.Show(
+                    "This galaxy cannot be saved because it contains no Unknown Enclaves. Please generate another.", "Invalid Galaxy", 
+                    MessageBoxButtons.OK, 
+                    MessageBoxIcon.Warning);
                 return;
             }
 
@@ -937,6 +940,36 @@ namespace X3_Mayhem_Galaxy_Generator
             Message($"{GetActiveMap()} is now the Active map in Mayhem 3.\r\nYou can now run Mayhem 3 to play this map.");
         }
 
+        /// <summary>
+        /// ZMap 1.8.6 (reverse-engineered from the now-closed source ZMap included with Mayhem 4).
+        /// Checks if the 00044.pck (old voice file) and Mayhem Galaxy Generator are present.
+        /// </summary>
+        private void DisableLegacyGalaxyGenerator()
+        {
+            string legacyPck = Path.Combine(m_CurX3RootFolder, "addon", "mov", "00044.pck");
+            string disabledPck = Path.Combine(m_CurX3RootFolder, "addon", "mov", "_00044.pck");
+
+            if (File.Exists(legacyPck))
+            {
+                if (File.Exists(disabledPck))
+                {
+                    // A backup already exists, so remove only the active copy.
+                    File.Delete(legacyPck);
+                }
+                else
+                {
+                    File.Move(legacyPck, disabledPck);
+                }
+            }
+
+            // Remove the obsolete standalone galaxy generator.
+            string legacyGenerator = Path.Combine(m_CurX3RootFolder, "Mayhem Galaxy Generator.exe");
+            if (File.Exists(legacyGenerator))
+            {
+                File.Delete(legacyGenerator);
+            }
+        }
+
         private void ActivateMap(string mapname, bool isActive)
         {
             if (!isActive)
@@ -984,12 +1017,13 @@ namespace X3_Mayhem_Galaxy_Generator
             string source = m_CurX3RootFolder + "mayhem_galaxies\\" + mapname;
             try
             {
+                DisableLegacyGalaxyGenerator();
                 X3Utils.CopyFolder(source, m_CurX3RootFolder);
             }
             catch(Exception x1)
             {
                 MessageBox.Show($"Error copying map files to Mayhem installation folder:  {x1.Message}");
-                MessageBox.Show($"Please ensure you do not have READ-ONLY files in your Mayhem 3 installation.  Or you can manually copy {source} to {m_CurX3RootFolder} which is what Activatin does.");
+                MessageBox.Show($"Please ensure you do not have READ-ONLY files in your Mayhem 3 installation. Or you can manually copy {source} to {m_CurX3RootFolder} which is what Activation does.");
             }
         }
 

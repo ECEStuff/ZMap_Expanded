@@ -41,7 +41,7 @@ namespace X3_Mayhem_Galaxy_Generator
             // btnOk
             // 
             this.btnOk.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this.btnOk.ForeColor = System.Drawing.Color.Green;
+            this.btnOk.ForeColor = System.Drawing.Color.DarkBlue;
             this.btnOk.Location = new System.Drawing.Point(153, 268);
             this.btnOk.Name = "btnOk";
             this.btnOk.Size = new System.Drawing.Size(166, 23);
@@ -53,7 +53,7 @@ namespace X3_Mayhem_Galaxy_Generator
             // btnCancel
             // 
             this.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.btnCancel.ForeColor = System.Drawing.Color.Red;
+            this.btnCancel.ForeColor = System.Drawing.Color.DarkRed;
             this.btnCancel.Location = new System.Drawing.Point(397, 268);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(236, 23);
@@ -72,7 +72,7 @@ namespace X3_Mayhem_Galaxy_Generator
             // 
             // btnSelectFolder
             // 
-            this.btnSelectFolder.ForeColor = System.Drawing.Color.Green;
+            this.btnSelectFolder.ForeColor = System.Drawing.Color.DarkBlue;
             this.btnSelectFolder.Location = new System.Drawing.Point(12, 211);
             this.btnSelectFolder.Name = "btnSelectFolder";
             this.btnSelectFolder.Size = new System.Drawing.Size(129, 23);

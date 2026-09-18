@@ -193,7 +193,8 @@ namespace X3_Mayhem_Galaxy_Generator
             // 
             // splitContainer1.Panel1
             // 
-            this.splitContainer1.Panel1.BackColor = System.Drawing.Color.Ivory;
+            // 1.8.6: Changed from ivory to system color.
+            this.splitContainer1.Panel1.BackColor = System.Drawing.SystemColors.Control;
             this.splitContainer1.Panel1.Controls.Add(this.btnCustomMusic);
             this.splitContainer1.Panel1.Controls.Add(this.btnHelpMain);
             this.splitContainer1.Panel1.Controls.Add(this.cbChaoticStart);
@@ -250,7 +251,7 @@ namespace X3_Mayhem_Galaxy_Generator
             // 
             this.btnHelpMain.BackColor = System.Drawing.Color.LightGray;
             this.btnHelpMain.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnHelpMain.ForeColor = System.Drawing.Color.Red;
+            this.btnHelpMain.ForeColor = System.Drawing.Color.DarkRed;
             this.btnHelpMain.Location = new System.Drawing.Point(69, 38);
             this.btnHelpMain.Name = "btnHelpMain";
             this.btnHelpMain.Size = new System.Drawing.Size(142, 23);
@@ -1452,7 +1453,7 @@ namespace X3_Mayhem_Galaxy_Generator
             // lblWarning
             // 
             this.lblWarning.AutoSize = false;
-            this.lblWarning.ForeColor = System.Drawing.Color.Red;
+            this.lblWarning.ForeColor = System.Drawing.Color.DarkRed;
             this.lblWarning.Name = "lblWarning";
             this.lblWarning.Size = new System.Drawing.Size(600, 22);
             this.lblWarning.Text = "toolStripLabel1";
@@ -1461,12 +1462,16 @@ namespace X3_Mayhem_Galaxy_Generator
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.BackColor = System.Drawing.Color.White;
+            this.BackColor = System.Drawing.SystemColors.Control;
             this.ClientSize = new System.Drawing.Size(1514, 965);
+            this.MinimumSize = new System.Drawing.Size(1000, 900);
+
             this.Controls.Add(this.splitContainer1);
             this.Controls.Add(this.toolStrip1);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "Form1";
+            this.Text = "Mayhem Expanded - Map Generator";
+
             this.Shown += new System.EventHandler(this.Form1_Shown);
             this.Resize += new System.EventHandler(this.Form1_Resize);
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();

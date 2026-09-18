@@ -130,7 +130,7 @@ namespace X3_Mayhem_Galaxy_Generator
             m_ShowStats = GetShowSetting("ShowStats");
 
             string ver = X3Utils.GetVersion();
-            this.Text = $"ZMap V{ver} - Created by Hairless-Ape, Modified by herobetty for Renegades Add-Ons";
+            this.Text = $"ZMap V{ver} - Created by Hairless-Ape, Modified by herobetty for Mayhem Expanded";
 
             SetupLocalization();
             UpdateRelationsGrid();
@@ -400,13 +400,13 @@ namespace X3_Mayhem_Galaxy_Generator
         {
             if (!X3Galaxy.HasUnknownEnclave())
             {
-                lblWarning.Text = "Warning!   This map has no unknown enclaves and while usable, does not support the new Renegades Plot line.";
-                lblWarning.ForeColor = System.Drawing.Color.Red;
+                lblWarning.Text = "INVALID: This map has no Unknown Enclaves. At least one is required for the Renegades plot.";
+                lblWarning.ForeColor = System.Drawing.Color.DarkRed;
             }
             else
             {
-                lblWarning.Text = "Map is Valid.   (Remember, double click a sector to edit stats, gates and more!)";
-                lblWarning.ForeColor = System.Drawing.Color.Green;
+                lblWarning.Text = "VALID: This map contains an Unknown Enclave. (Double-click a sector to edit stats, gates, and more.)";
+                lblWarning.ForeColor = System.Drawing.Color.DarkBlue;
             }
         }
 
@@ -730,7 +730,7 @@ namespace X3_Mayhem_Galaxy_Generator
             Persist p = new Persist();
             p.OnSettingsUpdated += UpdateUIFromGalaxySettings;
             p.Initialize();
-            p.ShowDialog();
+            p.ShowDialog(this);
 
             if (p.GalaxyWasLoaded)
             {
@@ -960,11 +960,11 @@ namespace X3_Mayhem_Galaxy_Generator
                                     break;
                                 case 1:
                                     lbl.Text = friend;
-                                    lbl.ForeColor = Color.Green;
+                                    lbl.ForeColor = Color.DarkBlue;
                                     break;
                                 case -1:
                                     lbl.Text = foe;
-                                    lbl.ForeColor = Color.Red;
+                                    lbl.ForeColor = Color.DarkRed;
                                     break;
                                 default:
                                     throw new Exception($"Invalid relation value {iRelation}");

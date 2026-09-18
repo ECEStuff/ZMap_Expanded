@@ -48,7 +48,7 @@
             this.lbAvailableGalaxies.FormattingEnabled = true;
             this.lbAvailableGalaxies.Location = new System.Drawing.Point(12, 29);
             this.lbAvailableGalaxies.Name = "lbAvailableGalaxies";
-            this.lbAvailableGalaxies.Size = new System.Drawing.Size(213, 251);
+            this.lbAvailableGalaxies.Size = new System.Drawing.Size(300, 300);
             this.lbAvailableGalaxies.TabIndex = 0;
             this.lbAvailableGalaxies.SelectedValueChanged += new System.EventHandler(this.lbAvailableGalaxies_SelectedValueChanged);
             // 
@@ -63,9 +63,9 @@
             // 
             // btnDeleteGalaxy
             // 
-            this.btnDeleteGalaxy.Location = new System.Drawing.Point(248, 248);
+            this.btnDeleteGalaxy.Location = new System.Drawing.Point(335, 265);
             this.btnDeleteGalaxy.Name = "btnDeleteGalaxy";
-            this.btnDeleteGalaxy.Size = new System.Drawing.Size(116, 23);
+            this.btnDeleteGalaxy.Size = new System.Drawing.Size(160, 30);
             this.btnDeleteGalaxy.TabIndex = 2;
             this.btnDeleteGalaxy.Text = "Delete";
             this.btnDeleteGalaxy.UseVisualStyleBackColor = true;
@@ -73,9 +73,9 @@
             // 
             // btnSetGalaxyAsCurrent
             // 
-            this.btnSetGalaxyAsCurrent.Location = new System.Drawing.Point(249, 99);
+            this.btnSetGalaxyAsCurrent.Location = new System.Drawing.Point(335, 110);
             this.btnSetGalaxyAsCurrent.Name = "btnSetGalaxyAsCurrent";
-            this.btnSetGalaxyAsCurrent.Size = new System.Drawing.Size(116, 23);
+            this.btnSetGalaxyAsCurrent.Size = new System.Drawing.Size(160, 30);
             this.btnSetGalaxyAsCurrent.TabIndex = 3;
             this.btnSetGalaxyAsCurrent.Text = "Set Active";
             this.btnSetGalaxyAsCurrent.UseVisualStyleBackColor = true;
@@ -83,9 +83,9 @@
             // 
             // btnLoadSelected
             // 
-            this.btnLoadSelected.Location = new System.Drawing.Point(248, 199);
+            this.btnLoadSelected.Location = new System.Drawing.Point(335, 200);
             this.btnLoadSelected.Name = "btnLoadSelected";
-            this.btnLoadSelected.Size = new System.Drawing.Size(116, 23);
+            this.btnLoadSelected.Size = new System.Drawing.Size(160, 30);
             this.btnLoadSelected.TabIndex = 4;
             this.btnLoadSelected.Text = "Load";
             this.btnLoadSelected.UseVisualStyleBackColor = true;
@@ -94,16 +94,16 @@
             // lblDeletesSelected
             // 
             this.lblDeletesSelected.AutoSize = true;
-            this.lblDeletesSelected.Location = new System.Drawing.Point(246, 233);
+            this.lblDeletesSelected.Location = new System.Drawing.Point(335, 246);
             this.lblDeletesSelected.Name = "lblDeletesSelected";
-            this.lblDeletesSelected.Size = new System.Drawing.Size(184, 13);
+            this.lblDeletesSelected.Size = new System.Drawing.Size(160, 30);
             this.lblDeletesSelected.TabIndex = 7;
             this.lblDeletesSelected.Text = "Deletes selected Map folder and files.";
             // 
             // lblLoadsSelected
             // 
             this.lblLoadsSelected.AutoSize = true;
-            this.lblLoadsSelected.Location = new System.Drawing.Point(246, 185);
+            this.lblLoadsSelected.Location = new System.Drawing.Point(335, 181);
             this.lblLoadsSelected.Name = "lblLoadsSelected";
             this.lblLoadsSelected.Size = new System.Drawing.Size(191, 13);
             this.lblLoadsSelected.TabIndex = 8;
@@ -112,7 +112,7 @@
             // lblCopiesSel
             // 
             this.lblCopiesSel.AutoSize = true;
-            this.lblCopiesSel.Location = new System.Drawing.Point(246, 83);
+            this.lblCopiesSel.Location = new System.Drawing.Point(335, 91);
             this.lblCopiesSel.Name = "lblCopiesSel";
             this.lblCopiesSel.Size = new System.Drawing.Size(135, 13);
             this.lblCopiesSel.TabIndex = 9;
@@ -120,16 +120,16 @@
             // 
             // tbGalaxyName
             // 
-            this.tbGalaxyName.Location = new System.Drawing.Point(370, 49);
+            this.tbGalaxyName.Location = new System.Drawing.Point(475, 53);
             this.tbGalaxyName.Name = "tbGalaxyName";
-            this.tbGalaxyName.Size = new System.Drawing.Size(117, 20);
+            this.tbGalaxyName.Size = new System.Drawing.Size(140, 20);
             this.tbGalaxyName.TabIndex = 12;
             // 
             // btnRandomName
             // 
-            this.btnRandomName.Location = new System.Drawing.Point(492, 48);
+            this.btnRandomName.Location = new System.Drawing.Point(625, 48);
             this.btnRandomName.Name = "btnRandomName";
-            this.btnRandomName.Size = new System.Drawing.Size(59, 22);
+            this.btnRandomName.Size = new System.Drawing.Size(90, 30);
             this.btnRandomName.TabIndex = 14;
             this.btnRandomName.Text = "Random";
             this.btnRandomName.UseVisualStyleBackColor = true;
@@ -138,7 +138,7 @@
             // lblSaveGenMapAs
             // 
             this.lblSaveGenMapAs.AutoSize = true;
-            this.lblSaveGenMapAs.Location = new System.Drawing.Point(246, 32);
+            this.lblSaveGenMapAs.Location = new System.Drawing.Point(335, 32);
             this.lblSaveGenMapAs.Name = "lblSaveGenMapAs";
             this.lblSaveGenMapAs.Size = new System.Drawing.Size(128, 13);
             this.lblSaveGenMapAs.TabIndex = 16;
@@ -146,9 +146,9 @@
             // 
             // btnSaveNew
             // 
-            this.btnSaveNew.Location = new System.Drawing.Point(248, 48);
+            this.btnSaveNew.Location = new System.Drawing.Point(335, 48);
             this.btnSaveNew.Name = "btnSaveNew";
-            this.btnSaveNew.Size = new System.Drawing.Size(116, 23);
+            this.btnSaveNew.Size = new System.Drawing.Size(130, 30);
             this.btnSaveNew.TabIndex = 15;
             this.btnSaveNew.Text = "Save";
             this.btnSaveNew.UseVisualStyleBackColor = true;
@@ -156,9 +156,15 @@
             // 
             // rtb1
             // 
-            this.rtb1.Location = new System.Drawing.Point(12, 286);
+            this.rtb1.Anchor = ((System.Windows.Forms.AnchorStyles)
+                ((((System.Windows.Forms.AnchorStyles.Top |
+                    System.Windows.Forms.AnchorStyles.Bottom) |
+                    System.Windows.Forms.AnchorStyles.Left) |
+                    System.Windows.Forms.AnchorStyles.Right)));
+            this.rtb1.Location = new System.Drawing.Point(12, 345);
             this.rtb1.Name = "rtb1";
-            this.rtb1.Size = new System.Drawing.Size(538, 151);
+            // 1.8.6: Was 538, 151
+            this.rtb1.Size = new System.Drawing.Size(726, 193);
             this.rtb1.TabIndex = 17;
             this.rtb1.Text = "";
             // 
@@ -166,7 +172,11 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(564, 449);
+            this.ClientSize = new System.Drawing.Size(750, 550);
+            this.MinimumSize = new System.Drawing.Size(750, 550);
+            this.MaximumSize = new System.Drawing.Size(1200, 800);
+
+            //this.ClientSize = new System.Drawing.Size(564, 449);
             this.Controls.Add(this.rtb1);
             this.Controls.Add(this.lblSaveGenMapAs);
             this.Controls.Add(this.btnSaveNew);
@@ -180,12 +190,13 @@
             this.Controls.Add(this.btnDeleteGalaxy);
             this.Controls.Add(this.lblSavedGalaxies);
             this.Controls.Add(this.lbAvailableGalaxies);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Sizable;
+            this.ShowIcon = false;
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Name = "Persist";
             this.Text = "Save/Load";
             this.ResumeLayout(false);
             this.PerformLayout();
-
         }
 
         #endregion
