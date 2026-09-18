@@ -130,7 +130,7 @@ namespace X3_Mayhem_Galaxy_Generator
             m_ShowStats = GetShowSetting("ShowStats");
 
             string ver = X3Utils.GetVersion();
-            this.Text = $"ZMap V{ver} - Created by Hairless-Ape, Modified by herobetty for Mayhem Expanded";
+            this.Text = $"ZMap {ver} - Mordan (Hairless-Ape) / herobetty - Mayhem Expanded";
 
             SetupLocalization();
             UpdateRelationsGrid();
