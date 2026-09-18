@@ -1,4 +1,4 @@
-**ZMap Expanded**
+# ZMap Expanded
 
 X3 Albion Prelude  Mayhem 3 Map Editor - Original by Mordan
 
