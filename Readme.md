@@ -1,3 +1,5 @@
+*** ZMap Expanded ***
+
 X3 Albion Prelude  Mayhem 3 Map Editor - Original by Mordan
 
 Mayhem Expanded: https://github.com/ECEStuff/Renegades_AddOns
