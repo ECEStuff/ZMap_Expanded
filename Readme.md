@@ -2,7 +2,7 @@ X3 Albion Prelude  Mayhem 3 Map Editor - Original by Mordan
 
 Mayhem Expanded: https://github.com/ECEStuff/Renegades_AddOns
 
-ZMap was originally created by Mordan. The original source was publicly released on GitHub as v1.8.2. 
+ZMap was originally created by Mordan. The original source was publicly released on GitHub as v1.8.2. However, ZMap for Mayhem 4 is proprietary.
 
 This repository preserves the original project and extends it to support features introduced in Mayhem Expanded.
 
