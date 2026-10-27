@@ -2,12 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Xml;
-using System.Drawing;
-using Newtonsoft.Json;
-using System.Diagnostics;
 
 namespace X3_Mayhem_Galaxy_Generator
 {
@@ -26,12 +21,14 @@ namespace X3_Mayhem_Galaxy_Generator
     /// </summary>
     public class X3Galaxy
     {
-        static readonly X3Galaxy m_Instance = new X3Galaxy();
-        public int MaxX, MaxY;
+        private static readonly X3Galaxy m_Instance = new X3Galaxy();
+        public int MaxX;
+        public int MaxY;
         public List<X3Sector> Sectors = new List<X3Sector>();
         private Random m_Rand = new Random();
         public GalaxySettings GalaxyCreationSettings = new GalaxySettings();
         public Dictionary<string, string> LocalizationDictionary = new Dictionary<string, string>();
+        public bool HasUnsavedChanges;
 
         public static bool HasUnknownEnclave()
         {
@@ -92,7 +89,10 @@ namespace X3_Mayhem_Galaxy_Generator
 
                 // Find the next available one from the master system list that we have not used yet.
                 SystemListItem nextAvailable = masterSystemList.Find(item => !usedNames.Contains(item.Name));
-                if (nextAvailable == null) throw new Exception("Couldn't find another available system name to use from the sector_names templates");
+                if (nextAvailable == null)
+                {
+                    throw new Exception("Couldn't find another available system name to use from the sector_names templates");
+                }
 
                 // Store it all into the sector for ease of retrieval when creating the output files.
                 sector.SectorName = nextAvailable.Name;
@@ -568,296 +568,5 @@ namespace X3_Mayhem_Galaxy_Generator
             }
         }
 
-    }
-
-   
-
-
-
-    /// <summary>
-    /// Type = 2
-    /// <o t="2" s="15"/>
-    /// 
-    /// \mayhem_data\custom_backgrounds.txt contains indicies 0-81
-    /// \mayhem_data\template_TBackgrounds.txt contains actual data for 81 backgrounds.
-    /// 
-    /// </summary>
-    public class X3Background
-    {
-        public int s;     // represents sub-type which is the 0-index into types/TBackgrounds.pck
-
-        public X3Background()
-        {
-
-        }
-
-        public X3Background(XmlNode node)
-        {
-            s = int.Parse(node.Attributes["s"]?.InnerText);
-        }
-
-        public void CreateXml(List<string> contents)
-        {
-            contents.Add($"\t<o t=\"2\" s=\"{s}\"/>");
-        }
-    }
-
-    /// <summary>
-    /// Type = 3
-    /// <o t="3" s="208" x="171233183" y="420674633" z="-167238936" color="16777160"/>
-    /// </summary>
-    public class X3Sun
-    {
-        private Random m_Rand = new Random();
-        public const int t = 3;
-        public int s;     // type of sun.index into type\TSuns.pck	0-218 index.See 11.cat.
-        public int x;
-        public int y;
-        public int z;
-        public int color;    // rgb color index. see appendix 3 in  http://www.xenotaph.net/lib_pdf/galaxy_hacking_x3tc.pdf
-
-
-        public X3Sun(string rawxml)
-        {
-            rawxml = rawxml.Replace(" =", "=").Replace("= ", "=");
-            // Here's a strange thing.  Sun ID's embedded in 11.cat\TSuns.pck look like this "SS_SUN_180" through "SS_SUN_189" for a given sun type.
-            // What's interesting is those that end in a 4 are 50% sun level in game. Those that end in 5 are 100% in game. etc.. up through those that end with 8 are 300% sun level in game.
-            // So we have to do the same here with our Sun ID because the template he provides has all the ID's and we don't want to be seeing sun levels lower than 100% in mayhem.
-            // He used ID's 13X through 19X, where X is between 4 and 8 inclusive.
-            s = int.Parse(X3Utils.GetXMLAttribute(rawxml, "s"));
-            x = int.Parse(X3Utils.GetXMLAttribute(rawxml, "x"));
-            y = int.Parse(X3Utils.GetXMLAttribute(rawxml, "y"));
-            z = int.Parse(X3Utils.GetXMLAttribute(rawxml, "z"));
-            color = int.Parse(X3Utils.GetXMLAttribute(rawxml, "color"));
-
-            // Sun ID's only exist in these ranges in TSuns.
-            if (s < 134)
-                s = 134;
-            if (s > 218)
-                s = 218;
-            // Test..  suns should be ID XX4 through XX8 which would be 100% to 300% sun levels.
-            int value = X3Utils.PlaceDigitValue(0, s);      // Grab last digit of the sun ID.
-            if ( value < 4 || value > 8)                    // If out of range of 50-300% sun level, put it back in range.
-            {
-                s = s - value + m_Rand.Next(4, 9);
-            }
-        }
-
-        public void SetSunLevel(int val)
-        {
-            StringBuilder sb = new StringBuilder(s.ToString());
-            sb[2] = val.ToString()[0];
-            s = int.Parse(sb.ToString());
-        }
-
-        public X3Sun(XmlNode node)
-        {
-            s = int.Parse(node.Attributes["s"]?.InnerText);
-            x = int.Parse(node.Attributes["x"]?.InnerText);
-            y = int.Parse(node.Attributes["y"]?.InnerText);
-            z = int.Parse(node.Attributes["z"]?.InnerText);
-            color = int.Parse(node.Attributes["color"]?.InnerText);
-        }
-
-        public void CreateXml(List<string> contents)
-        {
-            contents.Add($"\t<o t=\"3\" s=\"{s}\" x=\"{x}\" y=\"{y}\" z=\"{z}\" color=\"{color}\"/>");
-        }
-    }
-
-    /// <summary>
-    /// Type = 4
-    /// <o t="4" s="228" x="257613751" y="-31905822" z="-256982517"/>
-    /// </summary>
-    public class X3Planet
-    {
-        public const int t = 4;
-        public int s;
-        public int x;
-        public int y;
-        public int z;
-
-        public X3Planet(string rawxml)
-        {
-            rawxml = rawxml.Replace(" =", "=").Replace("= ", "=");
-            s = int.Parse(X3Utils.GetXMLAttribute(rawxml, "s"));
-            x = int.Parse(X3Utils.GetXMLAttribute(rawxml, "x"));
-            y = int.Parse(X3Utils.GetXMLAttribute(rawxml, "y"));
-            z = int.Parse(X3Utils.GetXMLAttribute(rawxml, "z"));
-        }
-
-        public X3Planet(XmlNode node)
-        {
-            s = int.Parse(node.Attributes["s"]?.InnerText);
-            x = int.Parse(node.Attributes["x"]?.InnerText);
-            y = int.Parse(node.Attributes["y"]?.InnerText);
-            z = int.Parse(node.Attributes["z"]?.InnerText);
-        }
-
-        public void CreateXml(List<string> contents)
-        {
-            contents.Add($"\t<o t=\"4\" s=\"{s}\" x=\"{x}\" y=\"{y}\" z=\"{z}\"/>");
-        }
-    }
-
-    /// <summary>
-    /// Type = 17
-    /// <o t="17" s="7" x="-7480000" y="4027500" z="-15130500" atype="1" aamount="17" a="42338" b="10784" g="27456"/>
-    /// </summary>
-    public class X3Asteroid
-    {
-        public const int t = 17;
-        public int s;           // sub-type, which is index into types\TAsteroids.pc     0-9.  See 07.cat.
-        public int x;
-        public int y;
-        public int z;
-        public int atype;       // atype - 0-Ore, 1=Silicon, 2=Nividium, 3=Ice
-        public int aamount;     // aamount = yield quantity
-        public int a;
-        public int b;
-        public int g;           // rotational factors.
-
-        public X3Asteroid(XmlNode node)
-        {
-            ParseXml(node);
-        }
-
-        public X3Asteroid(string rawxml)
-        {
-            rawxml = rawxml.Replace(" =", "=").Replace("= ", "=");
-            s = int.Parse(X3Utils.GetXMLAttribute(rawxml, "s"));
-            x = int.Parse(X3Utils.GetXMLAttribute(rawxml, "x"));
-            y = int.Parse(X3Utils.GetXMLAttribute(rawxml, "y"));
-            z = int.Parse(X3Utils.GetXMLAttribute(rawxml, "z"));
-            atype = int.Parse(X3Utils.GetXMLAttribute(rawxml, "atype"));
-            aamount = int.Parse(X3Utils.GetXMLAttribute(rawxml, "aamount"));
-            a = int.Parse(X3Utils.GetXMLAttribute(rawxml, "a"));
-            b = int.Parse(X3Utils.GetXMLAttribute(rawxml, "b"));
-            g = int.Parse(X3Utils.GetXMLAttribute(rawxml, "g"));
-        }
-
-
-        public void ParseXml(XmlNode node)
-        {
-            s = int.Parse(node.Attributes["s"]?.InnerText);
-            x = int.Parse(node.Attributes["x"]?.InnerText);
-            y = int.Parse(node.Attributes["y"]?.InnerText);
-            z = int.Parse(node.Attributes["z"]?.InnerText);
-            atype = int.Parse(node.Attributes["atype"]?.InnerText);
-            aamount = int.Parse(node.Attributes["aamount"]?.InnerText);
-            a = int.Parse(node.Attributes["a"]?.InnerText);
-            b = int.Parse(node.Attributes["b"]?.InnerText);
-            g = int.Parse(node.Attributes["g"]?.InnerText);
-        }
-
-        public void CreateXml(List<string> contents)
-        {
-            contents.Add($"\t<o t=\"17\" s=\"{s}\" x=\"{x}\" y=\"{y}\" z=\"{z}\" atype=\"{atype}\" aamount=\"{aamount}\" a=\"{a}\" b=\"{b}\" g=\"{g}\"/>");
-        }
-    }
-
-
-    /// <summary>
-    /// Type = 18
-    /// <o t="18" s="3" x="22426343" y="7498788" z="-518692" gid="3" gx="1" gy="0" gtid="2" a="49152" b="0" g="0"/>
-    /// Note about Location:
-    ///     x = left to right, y = depth (what I would consider z-axis), z = top to bottom.
-    ///     +z = up.  -z = down.
-    ///     +x = right
-    ///     x or z vary from ? to Sector size.  So for a system that is 25,000,000 size, the west gate may have x=-25,000,000 and an east gate having x=25,000,000
-    ///     other gate position values seem to range between 1 and 8 mil, putting them slightly off axis.. so a west gate may sit slightly above or below the horizontal axis.
-    ///     
-    ///     ON-AXIS Alignment of gates is within 20% of system size (i.e. for 22Mil system size, gate variance was -3.9M to +3.9M)
-    ///     OFF-AXIS Alighment of gate varied from 55% to 125% of system size.
-    /// 
-    /// </summary>
-    public class X3Gate
-    {
-        public const int t = 18;
-        public int s;           // SubType:  0 = North, 1 = South, 2 = West, 3 = East
-        public int x;           // physical coordinates.   left-right 
-        public int y;           // depth
-        public int z;           // up-down
-        public int gid;         // gid - always same as SubType.  denotes gate direction.
-        public int gx;          // represents the DESTINATION system coordinates for the gate, 0 based
-        public int gy;          // ""
-        public int gtid;        // represents the DESTINATION gate direction.  So for an SubType=1 (south gate), the destination gate would be 0 (north)
-
-        public bool IsRemoved = false;      // temporary to see stuff..
-        public bool IsSpecial = false;
-
-        // Gate rotations.
-        // North Gate - a="0"     b="0" g="0"
-        // South Gate - a="32768" b="0" g="0"
-        // West Gate -  a="16384" b="0" g="0"
-        // East Gate -  a="49152" b="0" g="0"
-        public int a;
-        public int b;
-        public int g;    
-
-        public X3Gate()
-        {
-
-        }
-        
-        public X3Gate(XmlNode node)
-        {
-            s = int.Parse(node.Attributes["s"]?.InnerText);
-            x = int.Parse(node.Attributes["x"]?.InnerText);
-            y = int.Parse(node.Attributes["y"]?.InnerText);
-            z = int.Parse(node.Attributes["z"]?.InnerText);
-            gid = int.Parse(node.Attributes["gid"]?.InnerText);
-            gx = int.Parse(node.Attributes["gx"]?.InnerText);
-            gy = int.Parse(node.Attributes["gy"]?.InnerText);
-            gtid = int.Parse(node.Attributes["gtid"]?.InnerText);
-            a = int.Parse(node.Attributes["a"]?.InnerText);
-            b = int.Parse(node.Attributes["b"]?.InnerText);
-            g = int.Parse(node.Attributes["g"]?.InnerText);
-        }
-
-        /// <summary>
-        /// Serialize the gate and save the line to contents.
-        /// </summary>
-        /// <param name="contents"></param>
-        public void CreateXml(List<string> contents)
-        {
-            contents.Add($"\t<o t=\"18\" s=\"{s}\" x=\"{x}\" y=\"{y}\" z=\"{z}\" gid=\"{gid}\" gx=\"{gx}\" gy=\"{gy}\" gtid=\"{gtid}\" a=\"{a}\" b=\"{b}\" g=\"{g}\" />");
-        }
-    }
-
-    /// <summary>
-    /// Type = 20
-    /// <o t="20" s="SS_SPECIAL_SIGN3" x="867612" y="-1200845" z="-4453430" a="0" b="0" g="0" v="-1"/>
-    /// </summary>
-    public class X3Special
-    {
-        public const int t = 20;
-        public string s;           // sub-type indexed in TSpecials.pck(SS_SPECIAL_SIGN1 through SS_SPECIAL_SIGN4) Odd donut shaped signs.
-        public int x;
-        public int y;
-        public int z;           // position
-        public int a;
-        public int b;
-        public int g;           // rotational factors.
-        public int v;           // video stream to be played on advertising buoys.	may want to play with this.
-
-        public X3Special(XmlNode node)
-        {
-            s = node.Attributes["s"]?.InnerText;
-            x = int.Parse(node.Attributes["x"]?.InnerText);
-            y = int.Parse(node.Attributes["y"]?.InnerText);
-            z = int.Parse(node.Attributes["z"]?.InnerText);
-
-            a = int.Parse(node.Attributes["a"]?.InnerText);
-            b = int.Parse(node.Attributes["b"]?.InnerText);
-            g = int.Parse(node.Attributes["g"]?.InnerText);
-
-            v = -1;
-        }
-
-        public void CreateXml(List<string> contents)
-        {
-            contents.Add($"\t<o t=\"20\" s=\"{s}\" x=\"{x}\" y=\"{y}\" z=\"{z}\" a=\"{a}\" b=\"{b}\" g=\"{g}\" v=\"{v}\"/>");
-        }
     }
 }
