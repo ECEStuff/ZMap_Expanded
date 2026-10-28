@@ -9,7 +9,8 @@ namespace X3_Mayhem_Galaxy_Generator
 {
     class BodGen
     {
-        private static int P = 2;
+        // Fallout reported that the private static int P = 2 was causing incorrectly numbered .bod records.
+        // The P assignment has been moved to Generate_00749() where it is reset to 2 each time the function is called.
 
         /// <summary>
         /// Mirrored/Ported from the original X3 script written by Litcube which created the \objects\cut\00749.bod file based on the loaded galaxy.
@@ -32,8 +33,9 @@ namespace X3_Mayhem_Galaxy_Generator
         /// 
         /// </summary>
         /// <param name="galaxy"></param>
-    public static string Generate_00749()
+        public static string Generate_00749()
         {
+            int p = 2; // Must be initialized here so that it is reset between map generation.
             StringBuilder sb = new StringBuilder();
             string mainsectorstring;
             int baseX = -36433;     // Asthetic only for lines... spacing and length I think.  Use anywhere between -26433 and -36433
@@ -60,12 +62,12 @@ namespace X3_Mayhem_Galaxy_Generator
                     X3Sector sector = X3Galaxy.Instance.Sectors.Find(item => item.x == x && item.y == y);
 
                     mainsectorstring = SecString(x + 1, y + 1);
-                    sb.AppendLine($"P {P}; B {mainsectorstring}; N {mainsectorstring};");      // "P 2; B 0101; N 0101;"
+                    sb.AppendLine($"P {p}; B {mainsectorstring}; N {mainsectorstring};");      // "P 2; B 0101; N 0101;"
 
                     int mainspacex = baseX + (x * SpacingX);
                     int mainspacey = baseY - (y * SpacingY);
                     sb.AppendLine($"  {{ 0x2002;  {mainspacex}; {mainspacey}; 0;  0.000000; 0.000000; 0.000000; 0.000000;  -1;  -1; }} // 0");    // { 0x2002;  -26433; 24776; 0;  0.000000; 0.000000; 0.000000; 0.000000;  -1;  -1; } // 0
-                    P++;
+                    p++;
 
                     // Here, I would have a list of 1-4 gates and we create output for each.
                     // Left Line (west gate, gid=2
@@ -78,8 +80,8 @@ namespace X3_Mayhem_Galaxy_Generator
                         int yoffset = (Math.Abs(sector.x - gate.gx) > 1) ? 500 : 0;
 
                         // This offsets the vertical line subtly to the right indicating it means it's a longer than normal gate.  I wish there were more options here.
-                        CreateGateLine(sb, gate.s, gate.gx, gate.gy, mainspacex + xoffset, mainspacey + yoffset, mainsectorstring);
-                        P++;
+                        CreateGateLine(sb, p, gate.s, gate.gx, gate.gy, mainspacex + xoffset, mainspacey + yoffset, mainsectorstring);
+                        p++;
                     }
                 }
             }
@@ -87,10 +89,10 @@ namespace X3_Mayhem_Galaxy_Generator
             return sb.ToString();
         }
 
-        private static void CreateGateLine(StringBuilder sb, int gatedirection, int destX, int destY, int spacex, int spacey, string mainsectorstring)
+        private static void CreateGateLine(StringBuilder sb, int p, int gatedirection, int destX, int destY, int spacex, int spacey, string mainsectorstring)
         {
             string mss = mainsectorstring + SecString(destX + 1, destY + 1);
-            sb.AppendLine($"P {P}; B {mss}; N {mss};");
+            sb.AppendLine($"P {p}; B {mss}; N {mss};");
 
             // NOTE: Mayhem 3's galaxy generator would add an additional ")" at the end of each of these, right after the trailing 0.  I think it was an error, but ignored by the system.  
 
