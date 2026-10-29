@@ -133,11 +133,12 @@ namespace X3_Mayhem_Galaxy_Generator
             string mapdimensions = $"{X3Galaxy.Instance.MaxX}, {X3Galaxy.Instance.MaxY}";
             int dejurect = X3Galaxy.Instance.Sectors.Count(item => item.SectorCreationData.DejureOwner != 0);
             int numdejurenotinsameracespace = X3Galaxy.Instance.Sectors.Count(item => item.SectorCreationData.DejureOwner != item.r && item.SectorCreationData.DejureOwner != 0);
-            int argondejourcount = X3Galaxy.Instance.Sectors.Count(item => item.SectorCreationData.DejureOwner == 1);
-            int borondejourcount = X3Galaxy.Instance.Sectors.Count(item => item.SectorCreationData.DejureOwner == 2);
-            int splitdejourcount = X3Galaxy.Instance.Sectors.Count(item => item.SectorCreationData.DejureOwner == 3);
-            int paraniddejourcount = X3Galaxy.Instance.Sectors.Count(item => item.SectorCreationData.DejureOwner == 4);
-            int teladidejourcount = X3Galaxy.Instance.Sectors.Count(item => item.SectorCreationData.DejureOwner == 5);
+            int argondejurecount = X3Galaxy.Instance.Sectors.Count(item => item.SectorCreationData.DejureOwner == 1);
+            int borondejurecount = X3Galaxy.Instance.Sectors.Count(item => item.SectorCreationData.DejureOwner == 2);
+            int splitdejurecount = X3Galaxy.Instance.Sectors.Count(item => item.SectorCreationData.DejureOwner == 3);
+            int paraniddejurecount = X3Galaxy.Instance.Sectors.Count(item => item.SectorCreationData.DejureOwner == 4);
+            int teladidejurecount = X3Galaxy.Instance.Sectors.Count(item => item.SectorCreationData.DejureOwner == 5);
+            int terrandejurecount = X3Galaxy.Instance.Sectors.Count(item => item.SectorCreationData.DejureOwner == (int)ERace.Terran);
             int terrancount = X3Galaxy.Instance.Sectors.Count(item => item.SectorCreationData.Terrans == 1);
             int nocompaniescount = X3Galaxy.Instance.Sectors.Count(item => item.SectorCreationData.Company == -1);
 
@@ -177,13 +178,14 @@ namespace X3_Mayhem_Galaxy_Generator
             Message("Max Gate Depth: " + maxGateDepth);
 
 
-            Message($"Dejour Count ({dejurect * 100/secct})%", dejurect);
-            Message($"Dejour race found in non-Dejure owned systems", numdejurenotinsameracespace);
-            Message($"Argon DejourOwner Count ({argondejourcount * 100/secct})%", argondejourcount);
-            Message($"Boron DejourOwner Count ({borondejourcount * 100 / secct})%", borondejourcount);
-            Message($"Split DejourOwner Count ({splitdejourcount * 100 / secct})%", splitdejourcount);
-            Message($"Paranid DejourOwner Count ({paraniddejourcount * 100 / secct})%", paraniddejourcount);
-            Message($"Teladi DejourOwner Count ({teladidejourcount * 100 / secct})%", teladidejourcount);
+            Message($"dejure Count ({dejurect * 100/secct})%", dejurect);
+            Message($"dejure race found in non-Dejure owned systems", numdejurenotinsameracespace);
+            Message($"Argon dejureOwner Count ({argondejurecount * 100/secct})%", argondejurecount);
+            Message($"Boron dejureOwner Count ({borondejurecount * 100 / secct})%", borondejurecount);
+            Message($"Split dejureOwner Count ({splitdejurecount * 100 / secct})%", splitdejurecount);
+            Message($"Paranid dejureOwner Count ({paraniddejurecount * 100 / secct})%", paraniddejurecount);
+            Message($"Teladi dejureOwner Count ({teladidejurecount * 100 / secct})%", teladidejurecount);
+            Message($"Terran dejureOwner Count ({terrandejurecount * 100 / secct})%", terrandejurecount);
             Message($"Abnormal Signals Min", X3Galaxy.Instance.Sectors.Min(item => item.SectorCreationData.Xenons));
             Message($"Abnormal Signals at 0", X3Galaxy.Instance.Sectors.Count(item => item.SectorCreationData.Xenons == 0));
             Message($"Abnormal Signals Max", X3Galaxy.Instance.Sectors.Max(item => item.SectorCreationData.Xenons));
@@ -393,7 +395,7 @@ namespace X3_Mayhem_Galaxy_Generator
 
             // Create /addon/types/gamestarts.xml      (this is an override loaded automatically by X3)
             src = m_CurX3RootFolder +"mayhem_data\\template_gamestarts.xml";
-            string src2 = m_CurX3RootFolder + "mayhem_data\\mayhem_data\\gamestart_ships.json";
+            string src2 = m_CurX3RootFolder + "mayhem_data\\gamestart_ships.json";
             dest = destroot + "\\addon\\types\\gamestarts.xml";
             try
             {
@@ -642,7 +644,7 @@ namespace X3_Mayhem_Galaxy_Generator
             List<X3Sector> stream1Sectors = X3Galaxy.Instance.Sectors.FindAll(item => item.StreamID == 1);
             List<X3Sector> stream2Sectors = X3Galaxy.Instance.Sectors.FindAll(item => item.StreamID == 2);
 
-            // Add a header.  This is not included in the template.
+            // Add a header. This is not included in the template.
             content.Add("<?xml version=\"1.0\" encoding=\"utf-8\" ?>");
             content.Add($"<language id=\"{language}\">");
 
@@ -873,38 +875,61 @@ namespace X3_Mayhem_Galaxy_Generator
                 fadeoutstartmax = 85500 * 500;
             }
 
-            fadeoutstart = r.Next(fadeoutstartmin, fadeoutstartmax);
-            fadeoutend = (int)(fadeoutstart * 1.1);                  // stop always seems like about 11% higher than start values for fadeout.
-
-            if (foglevelpercent == 0)
-            {
-                fadeoutstart = fadeoutstartmin;
-                fadeoutend = fadeoutstartmax;
-            }
-
-
             // Write this odd value to top of backgrounds file.  Not sure what the 25 stands for.
-            // 25;82;
+            // 25;248;
             dstTemplates.Add($"25;{srcTemplates.Count};");
 
             // Alter entries
             foreach (string srcTemplate in srcTemplates)
             {
                 string[] entries = srcTemplate.Split(';');
+
+                // ZMap 2.2: Space particles are independent of nebula dust.
                 entries[26] = X3Galaxy.Instance.GalaxyCreationSettings.UseParticles ? "80" : "0";
-                entries[19] = r.Next(fogdensitymin, fogdensitymax).ToString();
-                entries[24] = fadeoutstart.ToString();
-                entries[25] = fadeoutend.ToString();
-                for (int x=11; x<19; x++)
+
+                // The original template determines whether dust is supported.
+                int templateDustInstances = int.Parse(entries[19]);
+                bool enableDust = foglevelpercent > 0 && templateDustInstances > 0;
+                bool hasSelectableDustPart = false;
+
+                // Preserve the template's original dust-body weights.
+                for (int x = 11; x < 19; x++)
                 {
-                    entries[x] = X3Galaxy.Instance.GalaxyCreationSettings.FogLevelPercent == 0 ? "0" : "1";
+                    int templateWeight = int.Parse(entries[x]);
+
+                    if (!enableDust || templateWeight <= 0)
+                    {
+                        entries[x] = "0";
+                    }
+                    else
+                    {
+                        hasSelectableDustPart = true;
+                    }
                 }
 
-                // Combine entries back into ';' separated string.
-                string joined = string.Join(";", entries);
+                // Randomize density only for dust-enabled backgrounds.
+                entries[19] = enableDust && hasSelectableDustPart
+                    ? r.Next(fogdensitymin, fogdensitymax).ToString()
+                    : "0";
 
-                // save entry to dstTemplates
-                dstTemplates.Add(joined);
+
+                if (foglevelpercent == 0)
+                {
+                    fadeoutstart = fadeoutstartmin;
+                    fadeoutend = fadeoutstartmax;
+                }
+                else
+                {
+                    fadeoutstart = r.Next(fadeoutstartmin, fadeoutstartmax);
+                    fadeoutend = (int)(fadeoutstart * 1.1);
+                }
+
+                // Preserve existing fog fadeout behavior.
+                entries[24] = fadeoutstart.ToString();
+                entries[25] = fadeoutend.ToString();
+
+                // Save the generated background.
+                dstTemplates.Add(string.Join(";", entries));
             }
 
             // Save dstTemplates to dest file.
@@ -941,7 +966,7 @@ namespace X3_Mayhem_Galaxy_Generator
         }
 
         /// <summary>
-        /// ZMap 1.8.6 (reverse-engineered from the now-closed source ZMap included with Mayhem 4).
+        /// ZMap 2.2 (reverse-engineered from the now-closed source ZMap included with FoF).
         /// Checks if the 00044.pck (old voice file) and Mayhem Galaxy Generator are present.
         /// </summary>
         private void DisableLegacyGalaxyGenerator()

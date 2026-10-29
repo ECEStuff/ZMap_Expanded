@@ -130,7 +130,7 @@ namespace X3_Mayhem_Galaxy_Generator
             m_ShowStats = GetShowSetting("ShowStats");
 
             string ver = X3Utils.GetVersion();
-            this.Text = $"ZMap {ver} - Mordan (Hairless-Ape) / herobetty - Mayhem Expanded";
+            this.Text = $"ZMap Expanded v{ver} - by herobetty; original ZMap by Mordan (Hairless-Ape)";
 
             SetupLocalization();
             UpdateRelationsGrid();
@@ -421,6 +421,7 @@ namespace X3_Mayhem_Galaxy_Generator
         /// <param name="rootdata"></param>
         private void LoadMasterSystemsLists(string rootdata)
         {
+            m_MasterSystemList.Clear();
             string stream1 = rootdata + "sector_names_stream1.txt";
             string stream2 = rootdata + "sector_names_stream2.txt";
             List<string> s1 = File.ReadAllLines(stream1).ToList();
@@ -620,15 +621,21 @@ namespace X3_Mayhem_Galaxy_Generator
                                 new PointF(leftSide, topSide + textHeight));
                         }
 
+
                         if (m_ShowTerran == 1 && sector.SectorCreationData.Terrans == 1)
                         {
-                            g.DrawRectangle(new Pen(Color.White, 2), (leftSide) - 2, (topSide) - 2, elementwidth + 4, elementheight + 4);
+                            using (Pen borderPen = new Pen(Color.White, 2))
+                            {
+                                g.DrawRectangle(borderPen, leftSide - 2, topSide - 2, elementwidth + 4, elementheight + 4);
+                            }
                         }
                     }
 
                     backgroundBrush.Dispose();
                 }
             }
+
+            ft.Dispose();
         }
 
 
@@ -657,7 +664,11 @@ namespace X3_Mayhem_Galaxy_Generator
 
         private void btnX3SaveGameFolder_Click(object sender, EventArgs e)
         {
-            // Choose a different mayhem 3 saved game folder.
+            // Prefer the configured save folder, otherwise use the default X3AP location.
+            folderBrowserDialog1.SelectedPath = Directory.Exists(m_CurSaveGameFolder)
+                ? m_CurSaveGameFolder
+                : X3Utils.GetDefaultSaveGameFolder();
+
             if (folderBrowserDialog1.ShowDialog() == DialogResult.OK)
             {
                 if (!folderBrowserDialog1.SelectedPath.EndsWith("save"))

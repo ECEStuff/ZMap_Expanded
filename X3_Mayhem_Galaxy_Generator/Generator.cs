@@ -10,7 +10,6 @@ namespace X3_Mayhem_Galaxy_Generator
     class Generator
     {
         private List<EQuadrant> m_quadrantsAvailable;
-        private Random rand = new Random();
         private int m_AvgSpread;
         private int m_AvgSystemsPerRace;
         private Random m_Rand = new Random();
@@ -43,7 +42,8 @@ namespace X3_Mayhem_Galaxy_Generator
             //<t id="10090101">1</t>            // consumption     Type of food consumed.  See EFood.
             //<t id="10100101">4</t>            // company         4% chance galaxy wide for a company to exist in their race system.  + 1 company of every kind in unknown space.
 
-            List<X3Sector> populatedSectors = X3Galaxy.Instance.Sectors.FindAll(item => item.r >= (int)ERace.Argon && item.r <= (int)ERace.Teladi);
+            // Do not use RaceIsMain, because Xenon do not count toward de jure sectors.
+            List<X3Sector> populatedSectors = X3Galaxy.Instance.Sectors.FindAll(item => (item.r >= (int)ERace.Argon && item.r <= (int)ERace.Teladi) || item.r == (int)ERace.Terran);
             List<X3Sector> allSectors = X3Galaxy.Instance.Sectors;
 
             // Clear existing sector data because we may be re-generating over and over.
@@ -75,7 +75,7 @@ namespace X3_Mayhem_Galaxy_Generator
                 allSectors.ForEach(item => item.SectorCreationData.Research = m_Rand.Next(40, 101));
             }
 
-            // Support levels 8-15, Average 9.   So this is an odd distribution.  25% are at 8.  33% are at 9.  30% are at 10.  0% are at 11.  3% are 12 to 13.  6% are above 13.  
+            // Support levels 8-15, Average 9. So this is an odd distribution.  25% are at 8.  33% are at 9.  30% are at 10.  0% are at 11.  3% are 12 to 13.  6% are above 13.  
             int extrastations = m_Extrastats ? 3 : 0;
             allSectors.Shuffle();
             int p25 = (int)(allSectors.Count * 0.25);
@@ -527,7 +527,7 @@ namespace X3_Mayhem_Galaxy_Generator
             List<Color> colors = new List<Color>();
             for (int x = 0; x < 100; x++)
             {
-                colors.Add(Color.FromArgb(rand.Next(180), rand.Next(180), rand.Next(180)));
+                colors.Add(Color.FromArgb(m_Rand.Next(180), m_Rand.Next(180), m_Rand.Next(180)));
             }
 
             // Debug only.  Color Globs
@@ -725,7 +725,7 @@ namespace X3_Mayhem_Galaxy_Generator
                 systemsToCreate = 1;
             }
 
-            EQuadrant primaryQuadrant = m_quadrantsAvailable[rand.Next(m_quadrantsAvailable.Count)];
+            EQuadrant primaryQuadrant = m_quadrantsAvailable[m_Rand.Next(m_quadrantsAvailable.Count)];
             m_quadrantsAvailable.Remove(primaryQuadrant);
 
             // Divide map into 5 quadrants:  1 in middle and 4 on each corner.  Each race gets a quadrant.
@@ -796,7 +796,7 @@ namespace X3_Mayhem_Galaxy_Generator
                     {
                         continue;
                     }
-                    X3Sector afreeneighbor = freeneighbors[rand.Next(freeneighbors.Count)];    // pick one of them.
+                    X3Sector afreeneighbor = freeneighbors[m_Rand.Next(freeneighbors.Count)];    // pick one of them.
                     return afreeneighbor;
                 }
                 if (distance++ > 5) done = true;
@@ -916,7 +916,7 @@ namespace X3_Mayhem_Galaxy_Generator
                                 List<X3Sector> freeneighbors = X3Galaxy.Instance.GetNeighbors(randomvoidsec, distance).FindAll(item => item.IsInitialized == false); // get all uninitialized neighbors.
                                 if (freeneighbors.Count == 0) continue;
 
-                                X3Sector afreeneighbor = freeneighbors[rand.Next(freeneighbors.Count)];    // pick one of them.
+                                X3Sector afreeneighbor = freeneighbors[m_Rand.Next(freeneighbors.Count)];    // pick one of them.
                                 afreeneighbor.MarkSectorVoidorXenon(isXenon);
                                 done = true;
                                 break;

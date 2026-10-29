@@ -422,6 +422,30 @@ namespace X3_Mayhem_Galaxy_Generator
             File.WriteAllLines("Settings.txt", settings);
         }
 
+        public static string GetDefaultSaveGameFolder()
+        {
+            string folderPath = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
+            if (folderPath == string.Empty)
+            {
+                return string.Empty;
+            }
+
+            string saveFolder = Path.Combine(folderPath, "Egosoft", "X3AP", "save");
+            if (Directory.Exists(saveFolder))
+            {
+                return saveFolder;
+            }
+
+            string egosoftFolder = Path.Combine(folderPath, "Egosoft");
+            if (Directory.Exists(egosoftFolder))
+            {
+                return egosoftFolder;
+            }
+
+            return folderPath;
+        }
+
+
         public static void CopyFolder(string sourceFolder, string dest)
         {
             if (Directory.Exists(sourceFolder))

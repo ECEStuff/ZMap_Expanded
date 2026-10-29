@@ -16,6 +16,7 @@ namespace X3_Mayhem_Galaxy_Generator
     {
         private List<string> m_Bullets = new List<string>();
         private List<string> m_Ships = new List<string>();
+        private static readonly Random m_Rand = new Random();
 
         private enum EAdjust {ERandom, ERaise, ELower};
         public string MayhemFolder;
@@ -158,17 +159,18 @@ namespace X3_Mayhem_Galaxy_Generator
                 int adjustvalue;
                 int range = rbTwentypercent.Checked ? 20 : 30;
 
+
                 if (adjust == EAdjust.ERandom)
                 {
-                    adjustvalue = new Random().Next(-range, range);
+                    adjustvalue = m_Rand.Next(-range, range + 1);
                 }
                 else if (adjust == EAdjust.ELower)
                 {
-                    adjustvalue = new Random().Next(-10, -range);
+                    adjustvalue = m_Rand.Next(-range, -9);
                 }
                 else
                 {
-                    adjustvalue = new Random().Next(10, range);
+                    adjustvalue = m_Rand.Next(10, range + 1);
                 }
 
                 bool modified = false;
@@ -290,11 +292,11 @@ namespace X3_Mayhem_Galaxy_Generator
                 string mod;
                 if (rbTwentypercent.Checked)
                 {
-                    mod = AdjustBullet(src, new Random().Next(-20, 20));                 // Every weapon gets it's own random adjustment.
+                    mod = AdjustBullet(src, m_Rand.Next(-20, 21));                 // Every weapon gets it's own random adjustment.
                 }
                 else
                 {
-                    mod = AdjustBullet(src, new Random().Next(-30, 30));
+                    mod = AdjustBullet(src, m_Rand.Next(-30, 31));
                 }
                 newBullets.Add(mod);
                 count++;

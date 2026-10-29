@@ -42,7 +42,8 @@ namespace X3_Mayhem_Galaxy_Generator
 
             string title = X3Utils.GetLocalizedText("{SectorEditFormTitle}");
 
-            Text = title + $"  ({sector.x + 1},{sector.y + 1})"; ;
+            // Display the title using 0-based coordinates for consistency with in-game sector indexing.
+            Text = title + $"  ({sector.x},{sector.y})";
             lblSectorId.Text = sector.SectorID;
             lblSystemName.Text = sector.SectorName;
             lblMusicFile.Text = sector.m_MusicFileName + ".mp3";
@@ -246,7 +247,7 @@ namespace X3_Mayhem_Galaxy_Generator
                     else
                         xindx = m_Sector.r - 1;
 
-                    X3Galaxy.Instance.GalaxyCreationSettings.StartSectors[xindx, 0] = x;         // Sector starts are 1-based, whereas sector x,y locations are 0 based.
+                    X3Galaxy.Instance.GalaxyCreationSettings.StartSectors[xindx, 0] = x;
                     X3Galaxy.Instance.GalaxyCreationSettings.StartSectors[xindx, 1] = y;
                 }
             }

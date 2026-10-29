@@ -33,7 +33,7 @@ namespace X3_Mayhem_Galaxy_Generator
         // utility
         public bool IsVoid = false;
         public bool IsInitialized = false;
-        private Random m_Rand = new Random();
+        private static readonly Random m_Rand = new Random();
         public bool IsOrphaned = false;
         public Color GlobColor = Color.White;
         public int GlobID;
