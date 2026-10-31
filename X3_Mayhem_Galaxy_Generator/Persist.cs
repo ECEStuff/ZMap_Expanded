@@ -28,8 +28,6 @@ namespace X3_Mayhem_Galaxy_Generator
         {
             InitializeComponent();
         }
-
-
         public void Initialize()
         {
             m_X3SaveFolder = X3Utils.GetSetting("X3Save"); 
@@ -454,9 +452,14 @@ namespace X3_Mayhem_Galaxy_Generator
                 lbAvailableGalaxies.SelectedIndex = oldindex;
 
                 Message($"Map {tbGalaxyName.Text} successfully updated.", true);
-                ActivateMap(tbGalaxyName.Text, true);
-                Message($"Done.  You are ready to play.", false);
-
+                if (ActivateMap(tbGalaxyName.Text, true))
+                {
+                    Message("Done. You are ready to play.");
+                }
+                else
+                {
+                    Message("The map was saved, but activation failed.");
+                }
             }
             else
             {
@@ -957,37 +960,20 @@ namespace X3_Mayhem_Galaxy_Generator
 
             string selection = lbAvailableGalaxies.SelectedItem.ToString();
             bool isActiveMap = selection.Contains(ActiveString);
-
-
-            ActivateMap(selection, isActiveMap);
+            bool success = ActivateMap(selection, isActiveMap);
             LoadSavedGalaxiesList();
 
-            Message($"{GetActiveMap()} is now the Active map in Mayhem 3.\r\nYou can now run Mayhem 3 to play this map.");
+            if (success)
+            {
+                Message($"{GetActiveMap()} is now the Active map in Mayhem 3.\r\nYou can now run Mayhem 3 to play this map.");
+            }
         }
 
         /// <summary>
-        /// ZMap 2.2 (reverse-engineered from the now-closed source ZMap included with FoF).
-        /// Checks if the 00044.pck (old voice file) and Mayhem Galaxy Generator are present.
+        /// Removes the obsolete standalone Mayhem Galaxy Generator.
         /// </summary>
         private void DisableLegacyGalaxyGenerator()
         {
-            string legacyPck = Path.Combine(m_CurX3RootFolder, "addon", "mov", "00044.pck");
-            string disabledPck = Path.Combine(m_CurX3RootFolder, "addon", "mov", "_00044.pck");
-
-            if (File.Exists(legacyPck))
-            {
-                if (File.Exists(disabledPck))
-                {
-                    // A backup already exists, so remove only the active copy.
-                    File.Delete(legacyPck);
-                }
-                else
-                {
-                    File.Move(legacyPck, disabledPck);
-                }
-            }
-
-            // Remove the obsolete standalone galaxy generator.
             string legacyGenerator = Path.Combine(m_CurX3RootFolder, "Mayhem Galaxy Generator.exe");
             if (File.Exists(legacyGenerator))
             {
@@ -995,60 +981,131 @@ namespace X3_Mayhem_Galaxy_Generator
             }
         }
 
-        private void ActivateMap(string mapname, bool isActive)
+        /// <summary>
+        /// Disables the legacy sound file.
+        /// </summary>
+        private void DisableLegacySoundFile()
         {
-            if (!isActive)
+            string language = X3Utils.GetLocalizedText("language_id_file");
+            if (string.IsNullOrWhiteSpace(language))
             {
-                string activeMap = GetActiveMap();
-                
-                // Before Switching, first backup the active map saved games so they are not lost forever.
-                if (activeMap != "")
-                {
-                    string galaxysavepath = m_X3SaveFolder + "backup_" + activeMap + "\\";
-                    if (!Directory.Exists(galaxysavepath))
-                    {
-                        Directory.CreateDirectory(galaxysavepath);
-                    }
-
-                    // Copy all the current X3 save files into a subfolder for it's galaxy.
-                    Directory.GetFiles(m_X3SaveFolder, "*.sav").ToList().ForEach(item => File.Copy(item, galaxysavepath + Path.GetFileName(item), true)); ;
-
-                    // Now delete the X3 save games.
-                    Directory.GetFiles(m_X3SaveFolder, "*.sav").ToList().ForEach(item => File.Delete(item));
-                }
-
-                // Copy any previously saved games from the newly selected galaxy save folder to the root save folder.
-                string sourcepath = m_X3SaveFolder + "backup_" + mapname + "\\";
-                if (Directory.Exists(sourcepath))
-                {
-                    Directory.GetFiles(sourcepath, "*.sav").ToList().ForEach(item => File.Copy(item, m_X3SaveFolder + Path.GetFileName(item), true));
-                }
-
-                // Update the displayed list.  
-                int oldindex = lbAvailableGalaxies.SelectedIndex;
-                LoadSavedGalaxiesList();
-                lbAvailableGalaxies.SelectedIndex = oldindex;           // restore the selection, as refreshing the list unselects.
-            }
-            else
-            {
-                // Need to strip off " (Active) from the mapname here, or it will never copy.  Fail.
-                // This happens if someone selects a map that is already active, and tried to activate it...  More than likely trying to use an old map,
-                // or it can happen if you activate a map, make some edits and then re-activate it.
-                mapname = mapname.Replace(ActiveString, string.Empty);
+                MessageBox.Show(
+                    "Unable to determine the speech file language.",
+                    "Speech Index Warning",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning);
+                return;
             }
 
-            // Copy the selected Galaxy folder to the X3 root folder overwriting all the generated files.
-            Message($"Copying {mapname} files to {m_CurX3RootFolder}", false);
-            string source = m_CurX3RootFolder + "mayhem_galaxies\\" + mapname;
+            string packedFile = Path.Combine(
+                m_CurX3RootFolder, "addon", "mov", $"000{language}.pck");
+
+            if (!File.Exists(packedFile))
+                return;
+
             try
             {
+                // Archive the original outside the active game directory.
+                string backupFolder = Path.Combine(
+                    m_CurX3RootFolder, "ZMap_Backups", "Speech");
+
+                Directory.CreateDirectory(backupFolder);
+
+                // A timestamp identifies the backup.
+                string backupName = $"000{language}_{DateTime.UtcNow:yyyyMMdd_HHmmssfff}.pck";
+                string backupFile = Path.Combine(backupFolder, backupName);
+                File.Move(packedFile, backupFile);
+
+                Message($"Archived legacy speech file {Path.GetFileName(packedFile)}.");
+                Message($"Backup: {backupFile}");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(
+                    $"Could not disable the legacy speech file:\r\n{ex.Message}\r\n\r\n" +
+                    "The galaxy files were copied, but the board computer may " +
+                    "continue announcing the original sector names.",
+                    "Speech Index Warning",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning);
+            }
+        }
+
+
+        /// <summary>
+        /// Activates a saved galaxy and, when switching galaxies, backs up/restores its savegames.
+        /// A successful result means file operations completed, not that the game was tested.
+        /// </summary>
+        private bool ActivateMap(string mapname, bool isActive)
+        {
+            try
+            {
+                mapname = mapname.Replace(ActiveString, string.Empty);
+                string source = Path.Combine(m_CurX3RootFolder, "mayhem_galaxies", mapname);
+
+                // Check the source before touching any savegames.
+                if (!Directory.Exists(source))
+                {
+                    MessageBox.Show($"Galaxy folder not found: {source}");
+                    return false;
+                }
+
+                string settingsFile = Path.Combine(source, "GalaxySettings.json");
+                string universeFile = Path.Combine(source, "addon", "maps", "x3_universe.xml");
+
+                // Check for essential files before proceeding with activation.
+                if (!File.Exists(settingsFile) || !File.Exists(universeFile))
+                {
+                    MessageBox.Show(
+                        $"Galaxy '{mapname}' is missing essential files and cannot be activated.",
+                        "Invalid Galaxy",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Error);
+                    return false;
+                }
+
+                if (!isActive)
+                {
+                    string activeMap = GetActiveMap();
+
+                    if (!string.IsNullOrEmpty(activeMap))
+                    {
+                        string backupFolder = Path.Combine(m_X3SaveFolder, "backup_" + activeMap);
+                        Directory.CreateDirectory(backupFolder);
+
+                        string[] existingSaves = Directory.GetFiles(m_X3SaveFolder, "*.sav");
+
+                        // Only delete the current saves after every backup copy succeeds.
+                        foreach (string save in existingSaves)
+                            File.Copy(save, Path.Combine(backupFolder, Path.GetFileName(save)), true);
+
+                        foreach (string save in existingSaves)
+                            File.Delete(save);
+                    }
+
+                    string savedBackup = Path.Combine(m_X3SaveFolder, "backup_" + mapname);
+                    if (Directory.Exists(savedBackup))
+                    {
+                        foreach (string save in Directory.GetFiles(savedBackup, "*.sav"))
+                            File.Copy(save, Path.Combine(m_X3SaveFolder, Path.GetFileName(save)), true);
+                    }
+                }
+
+                Message($"Copying {mapname} files to {m_CurX3RootFolder}");
                 DisableLegacyGalaxyGenerator();
                 X3Utils.CopyFolder(source, m_CurX3RootFolder);
+                DisableLegacySoundFile(); // Warns separately if the packed speech file cannot be archived.
+                return true;
             }
-            catch(Exception x1)
+            catch (Exception ex)
             {
-                MessageBox.Show($"Error copying map files to Mayhem installation folder:  {x1.Message}");
-                MessageBox.Show($"Please ensure you do not have READ-ONLY files in your Mayhem 3 installation. Or you can manually copy {source} to {m_CurX3RootFolder} which is what Activation does.");
+                MessageBox.Show(
+                    $"Could not activate galaxy '{mapname}': {ex.Message}\r\n\r\n" +
+                    "Activation may be incomplete. Check the game installation and save files before playing.",
+                    "Galaxy Activation Failed",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+                return false;
             }
         }
 
@@ -1059,50 +1116,62 @@ namespace X3_Mayhem_Galaxy_Generator
             tbGalaxyName.Text = lbAvailableGalaxies.SelectedItem.ToString().Replace(ActiveString, "");
         }
 
-
         private void btnDeleteGalaxy_Click(object sender, EventArgs e)
         {
             if (lbAvailableGalaxies.SelectedItem == null)
             {
-                Message("Please select a map to Delete.");
+                Message("Please select a map to delete.");
                 return;
             }
 
-            string selectedGalaxyName = lbAvailableGalaxies.SelectedItem.ToString();
-            selectedGalaxyName = selectedGalaxyName.Replace(ActiveString, "");
+            string selectedGalaxyName = lbAvailableGalaxies.SelectedItem.ToString().Replace(ActiveString, string.Empty);
+
+            // Do not delete the currently active galaxy.
+            if (string.Equals(selectedGalaxyName, GetActiveMap(),
+                StringComparison.OrdinalIgnoreCase))
+            {
+                MessageBox.Show(
+                    "You cannot delete the active galaxy. Activate another galaxy first.",
+                    "Cannot Delete Galaxy",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning);
+                return;
+            }
+
+            string pathToDelete = Path.Combine(
+                m_CurX3RootFolder, "mayhem_galaxies", selectedGalaxyName);
+
+            if (!Directory.Exists(pathToDelete))
+            {
+                Message($"Galaxy folder does not exist: {pathToDelete}");
+                return;
+            }
 
             // Ask if they are sure first!
             string msg = X3Utils.GetLocalizedText("{DelMapWarning}");
             string warning = X3Utils.GetLocalizedText("{Warning}");
-            if (MessageBox.Show(msg + $"{selectedGalaxyName}?", warning, MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.No)
+            if (MessageBox.Show(msg + selectedGalaxyName + "?", warning, MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
             {
                 return;
             }
 
-            string pathToDelte = m_CurX3RootFolder + "mayhem_galaxies\\" + selectedGalaxyName + "\\";
-
-            if (!Directory.Exists(pathToDelte))
-            {
-                Message($"{pathToDelte} Folder does not exist)");
-                return;
-            }
             try
             {
-                Directory.Delete(pathToDelte, true);
+                Directory.Delete(pathToDelete, true);
             }
-            catch(Exception x)
+            catch (Exception ex)
             {
-                Message($"Error Deleting folder {pathToDelte}: {x.Message}");
+                Message($"Error deleting galaxy {selectedGalaxyName}: {ex.Message}");
+                return;
             }
 
-            Message("Successfully deleted folder " + pathToDelte);
+            Message($"Successfully deleted galaxy {selectedGalaxyName}.");
 
-            // Delete any backup saved game files that may have existed for this galaxy.
-            string galaxysavepath = m_X3SaveFolder + "backup_" + selectedGalaxyName + "\\";
-            if (!Directory.Exists(galaxysavepath))
-            {
-                Directory.CreateDirectory(galaxysavepath);
-            }
+            // Preserve existing savegame backups.
+            string backupFolder = Path.Combine(m_X3SaveFolder, "backup_" + selectedGalaxyName);
+
+            if (Directory.Exists(backupFolder))
+                Message($"Savegame backup preserved at: {backupFolder}");
 
             LoadSavedGalaxiesList();
         }

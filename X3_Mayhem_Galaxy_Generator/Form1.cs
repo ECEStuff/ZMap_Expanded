@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Drawing.Drawing2D;
+using System.Drawing.Text;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -467,6 +469,12 @@ namespace X3_Mayhem_Galaxy_Generator
 
             if (X3Galaxy.Instance.Sectors.Count == 0) return;
 
+            // Smooth galaxy map geometry.
+            e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
+
+            // Use Windows' preferred text rendering.
+            e.Graphics.TextRenderingHint = TextRenderingHint.SystemDefault;
+
             int maxx = X3Galaxy.Instance.MaxX * 2 - 1;
             int maxy = X3Galaxy.Instance.MaxY * 2 - 1;
 
@@ -485,17 +493,19 @@ namespace X3_Mayhem_Galaxy_Generator
             int elementwidth = totalwidth / maxx;
             int elementheight = totalheight / maxy;
 
-            for (int x=0; x < maxx; x++)
+            for (int x = 0; x < maxx; x++)
             {
-                for (int y=0; y < maxy; y++)
+                for (int y = 0; y < maxy; y++)
                 {
                     if (x % 2 == 0 && y % 2 == 0)
                     {
                         DrawSector(e.Graphics, x, y, elementwidth, elementheight);
-                        DrawGateLines(e.Graphics, x, y, elementwidth, elementheight);
                     }
                 }
             }
+
+            // Draw connections once, after all sector tiles are rendered.
+            DrawGateLines(e.Graphics, elementwidth, elementheight);
         }
 
         private void DrawSector(Graphics g, int x, int y, int elementwidth, int elementheight)
@@ -691,7 +701,7 @@ namespace X3_Mayhem_Galaxy_Generator
             }
         }
 
-        private void DrawGateLines(Graphics g, int x, int y, int elementwidth, int elementheight)
+        private void DrawGateLines(Graphics g, int elementwidth, int elementheight)
         {
             int linelength, startx = 0, starty = 0, endx = 0, endy = 0;
             Pen p = Pens.White;

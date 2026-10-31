@@ -153,36 +153,26 @@ namespace X3_Mayhem_Galaxy_Generator
             return new GalaxySettings();
         }
 
-        //public static GalaxySettings LoadSettingsFile(string path)
-        //{
-        //    if (File.Exists(path))
-        //    {
-        //        string settings = File.ReadAllText(path);
-        //        return JsonConvert.DeserializeObject<GalaxySettings>(settings);
-        //    }
-        //    return new GalaxySettings();
-        //}
-
         public static string GetXMLAttribute(string src, string attr)
         {
-            List<char> chars = new List<char>();
-
-            int equalcount = 0;
             string searchfor = $" {attr}=";
-            int attrindex = src.IndexOf(searchfor) + searchfor.Length;
-            for (int index = attrindex; ; index++)
-            {
-                if (src[index] == '"')
-                {
-                    equalcount++;
-                    if (equalcount == 2) break;
-                    continue;
-                }
-                chars.Add(src[index]);
-            }
-            return new string(chars.ToArray());
-        }
+            int attrindex = src.IndexOf(searchfor, StringComparison.Ordinal);
 
+            if (attrindex == -1)
+                throw new Exception($"Attribute {attr} not found in: {src}");
+
+            int start = attrindex + searchfor.Length;
+
+            if (start >= src.Length || src[start] != '"')
+                throw new Exception($"Attribute {attr} is not properly quoted in: {src}");
+
+            int end = src.IndexOf('"', start + 1);
+
+            if (end == -1)
+                throw new Exception($"Attribute {attr} is not properly quoted in: {src}");
+
+            return src.Substring(start + 1, end - start - 1);
+        }
 
         /// <summary>
         /// k = position of digit you want.
